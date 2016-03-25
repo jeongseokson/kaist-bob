@@ -1,0 +1,32 @@
+{
+  "name": "kaist-bob",
+  "version": "0.0.1",
+  "description": "Slack bot scraping KAIST cafeteria menus",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/invictusjs/kaist-bob.git"
+  },
+  "keywords": [
+    "KAIST",
+    "Slack",
+    "bot",
+    "cafeteria",
+    "menu"
+  ],
+  "author": "Jeongseok Son",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/invictusjs/kaist-bob/issues"
+  },
+  "homepage": "https://github.com/invictusjs/kaist-bob#readme",
+  "dependencies": {
+    "botkit": "0.0.12",
+    "cheerio": "^0.20.0",
+    "moment": "^2.12.0",
+    "request": "^2.69.0"
+  }
+}
