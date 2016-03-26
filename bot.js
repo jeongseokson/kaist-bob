@@ -3,14 +3,18 @@ var os = require('os');
 var moment = require('moment');
 var util = require('util');
 var scraper = require('./scraper.js');
+var cron = require('cron');
 
 var DATE_FORMAT = 'YYYY-MM-DD';
 var INVAL_MESSAGE_RESP = ":confused: 무슨 말인지 모르겠어요. *!밥 도움말* 을 확인하세요.";
 var EMPTY_MENU_RESP = ":disappointed: %s %s에 %s 식당은 운영하지 않아요.";
 var MENU_FORMAT = ":rice: *%s* *%s* 식당 *%s* 식단:\n>>>%s"
-
+var NOTI_FORMAT = ":clock11: %s 식사 시간 입니다. %s"
+var HURRY = ["지금 가면 자리 많아요.", "밥 먹고 일해요.", "얼른 가야 줄 안 서요."]
+var DEFAULT_NOTI_CRON = "00 20 11 * * 1-5"
 var MAX_WORDS_IN_MSG = 3;
 
+var defaultCafeName = '교수회관';
 
 if (!process.env.token) {
     console.log('Error: Specify token in environment');
@@ -32,7 +36,6 @@ var cafeNameToCode = {
     '문지': 'munji',
     '화암': 'hwaam'
 };
-var defaultCafeName = '교수회관';
 
 var mealToId = {
     '아침': 0,
@@ -63,8 +66,6 @@ var getDefaultMealName = function() {
 };
 
 var messageHandler = function(bot, message) {
-    var msgArr = message.match.length > 1 ? message.match[1].split(' ') : [];
-
     var cafeName = defaultCafeName;
     var mealName = getDefaultMealName();
     var date = moment().format(DATE_FORMAT);
@@ -72,10 +73,11 @@ var messageHandler = function(bot, message) {
     var cafeCode = cafeNameToCode[defaultCafeName];
     var mealId = mealToId[mealName];
 
-
     var validityCheckArr = Array(MAX_WORDS_IN_MSG);
     var valid = true;
     var i;
+
+    var msgArr = message.match.length > 1 ? message.match[1].split(' ') : [];
 
     if (msgArr.length == 1 && msgArr[0] === HELP_CMD) {
         bot.reply(message, HELP_MESSAGE);
@@ -128,5 +130,36 @@ var messageHandler = function(bot, message) {
     });
 };
 
+var randomPick = function(array) {
+    return arr[Math.floor(Math.random() * array.length)];
+};
+
+var notificationJob = new cron.CronJob(DEFAULT_NOTI_CRON, function() {
+    var cafeName = defaultCafeName;
+    var mealName = getDefaultMealName();
+    var date = moment().format(DATE_FORMAT);
+
+    var cafeCode = cafeNameToCode[defaultCafeName];
+    var mealId = mealToId[mealName];
+
+    var returnOption = function (result, channelId) {
+        return {
+            text: util.format(NOTI_FORMAT, mealName, randomPick(HURRY)) + '\n'
+                + (result == '' ?
+                        util.format(EMPTY_MENU_RESP, date, mealName, cafeName) :
+                        util.format(MENU_FORMAT, date, cafeName, mealName, result)),
+            channel: channelId
+        }
+    };
+
+    bot.api.channels.list({'exclude_archived': 1}, function(err, res) {
+        scraper.scrapeMenu(cafeCode, date, mealId, function(result) {
+            for (i = 0; i < res.channels.length; ++i)
+                bot.say(returnOption(result, res.channels[i].id));
+        });
+    });
+});
+
 controller.hears(['!밥 (.*)', '!밥'], 'direct_message,direct_mention,mention',
         messageHandler);
+notificationJob.start();
