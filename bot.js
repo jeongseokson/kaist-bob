@@ -160,6 +160,6 @@ var notificationJob = new cron.CronJob(DEFAULT_NOTI_CRON, function() {
     });
 });
 
-controller.hears(['!밥 (.*)', '!밥'], 'direct_message,direct_mention,mention',
+controller.hears(['!밥 (.*)', '!밥'], 'direct_message,direct_mention,mention,ambient',
         messageHandler);
 notificationJob.start();
