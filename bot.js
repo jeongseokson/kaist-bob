@@ -93,7 +93,7 @@ var messageHandler = function(bot, message) {
         word = msgArr[i];
         if (word in cafeNameToCode) {
             cafeCode = cafeNameToCode[word];
-            cafeNmae = word;
+            cafeName = word;
             validityCheckArr[0] += 1;
         } else if (word in mealToId) {
             mealId = mealToId[word];
