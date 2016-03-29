@@ -130,8 +130,8 @@ var messageHandler = function(bot, message) {
     });
 };
 
-var randomPick = function(array) {
-    return arr[Math.floor(Math.random() * array.length)];
+var randomPick = function(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
 };
 
 var notificationJob = new cron.CronJob(DEFAULT_NOTI_CRON, function() {
