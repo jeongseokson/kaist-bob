@@ -25,6 +25,7 @@ exports.scrapeMenu = function(cafeCode, date, meal, onReturn) {
             var $ = cheerio.load(html);
             var text =
                 $('table.menuTb tbody tr td').eq(meal).text();
+            text = text.replace(/\r/g, "");
             onReturn(text);
         } else {
             console.log("Error: Can't access the web page");
