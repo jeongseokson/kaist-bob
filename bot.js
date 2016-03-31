@@ -158,6 +158,14 @@ var notificationJob = new cron.CronJob(DEFAULT_NOTI_CRON, function() {
                 bot.say(returnOption(result, res.channels[i].id));
         });
     });
+
+    bot.api.groups.list({'exclude_archived': 1}, function(err, res) {
+        scraper.scrapeMenu(cafeCode, date, mealId, function(result) {
+            for (i = 0; i < res.groups.length; ++i)
+                bot.say(returnOption(result, res.groups[i].id));
+        });
+    });
+
 });
 
 controller.hears(['!밥 (.*)', '!밥'], 'direct_message,direct_mention,mention,ambient',
